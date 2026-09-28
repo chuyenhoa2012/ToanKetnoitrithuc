@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Bài riêng – Chứng minh A chia hết cho 3</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-dark: #1d4ed8; --success: #16a34a; --danger: #b91c1c;
+      --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --muted: #64748b; --radius: 16px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overscroll-behavior: none; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      padding: 12px; padding-bottom: calc(12px + var(--safe-bottom));
+      max-width: 920px; margin: 0 auto; -webkit-font-smoothing: antialiased;
+    }
+    h1 { font-size: 1.25rem; margin-bottom: 2px; color: #0f172a; font-weight: 700; }
+    .subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 14px; }
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.07); padding: 16px; }
+    .problem-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .problem-nav button {
+      flex: 1 1 70px; min-height: 42px; padding: 8px 10px; border: 2px solid #e2e8f0;
+      border-radius: 12px; background: #fff; color: #334155; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+    }
+    .problem-nav button.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+    .problem-nav button.done { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+    .de-bai {
+      background: #eff6ff; border-left: 4px solid var(--primary); padding: 12px 14px;
+      border-radius: 0 12px 12px 0; margin-bottom: 12px; font-size: 0.95rem; line-height: 1.55; min-height: 72px;
+    }
+    .figure-area {
+      display: flex; justify-content: center; background: #f8fafc; border-radius: 14px;
+      padding: 12px 10px 18px; margin-bottom: 12px; overflow: hidden; min-height: 0;
+    }
+    .figure-area.hidden { display: none; }
+    svg { max-width: 100%; height: auto; }
+    .de-bai, .msg.key, .msg.conclusion, .msg.lesson { line-height: 1.9; }
+    .chain { text-align: left; font-weight: 600; font-size: 0.93rem; overflow-x: auto; padding: 2px 0; }
+    .crow { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .crow .eq { color: #64748b; font-weight: 700; min-width: 14px; }
+    .crow .ex { color: #14532d; max-width: 100%; overflow-x: auto; }
+    .why { margin: 2px 0 2px 22px; font-size: 0.82rem; font-weight: 500; color: #1d4ed8; line-height: 1.55; text-align: left; }
+    .fm { background: #f5f3ff; border: 1.5px solid #7c3aed; border-radius: 10px; padding: 8px 10px; margin: 6px 0; text-align: center; color: #5b21b6; }
+    .fm .fx { font-size: 0.9rem; }
+    .fm .tag { display: block; font-size: 0.74rem; font-weight: 700; color: #7c3aed; margin-bottom: 2px; }
+    .fmi { color: #6d28d9; background: #f5f3ff; border-radius: 4px; padding: 0 4px; font-weight: 700; }
+    .hl { background: #fde68a; border-radius: 4px; padding: 0 3px; }
+    .res { display: inline-block; background: #bbf7d0; border-radius: 6px; padding: 0 4px; color: #166534; }
+    .think { text-align: left; font-weight: 500; font-size: 0.92rem; color: #334155; background: #fff7ed; border-left: 4px solid #fb923c; border-radius: 6px; padding: 6px 10px; margin: 6px 0; line-height: 1.7; }
+    .warn { text-align: left; font-weight: 600; font-size: 0.92rem; color: #991b1b; background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 6px; padding: 8px 10px; line-height: 1.7; }
+    .legend { font-size: 0.85rem; line-height: 2; text-align: center; color: #334155; }
+    .legend .lg-note { color: #1d4ed8; }
+    .cases { text-align: left; font-weight: 600; font-size: 0.95rem; line-height: 2; color: #14532d; margin: 6px 0; }
+    .proof { background: #ecfdf5; border: 2px solid #059669; border-radius: 10px; padding: 8px 12px; margin: 6px 0; color: #065f46; font-weight: 700; text-align: center; line-height: 1.7; }
+    .ub { display: inline-block; text-align: center; vertical-align: top; }
+    .ub .ubt { display: block; line-height: 1.2; }
+    .ub .ubb { display: block; height: 6px; border: 1.5px solid currentColor; border-top: none; border-radius: 0 0 8px 8px; margin: 1px 2px 0; }
+    .ub .ubl { display: block; font-size: 0.7em; font-weight: 500; line-height: 1.2; margin-top: 1px; }
+    .nb { white-space: nowrap; }
+    .rad { display: inline-block; white-space: nowrap; vertical-align: baseline; }
+    .rad .rs { display: inline-block; font-weight: 700; margin-right: 1px; }
+    .rad .rc { display: inline-block; border-top: 1.6px solid currentColor; padding: 3px 2px 0 2px; line-height: 1.25; }
+    .frac { display: inline-block; vertical-align: middle; text-align: center; margin: 4px 3px; }
+    .frac .n { display: block; border-bottom: 1.5px solid currentColor; padding: 4px 4px 4px; line-height: 1.3; }
+    .frac .d { display: block; padding: 9px 4px 2px; line-height: 1.3; }
+    .calc-box {
+      font-family: "Cambria Math", "Times New Roman", "Courier New", monospace;
+      font-size: 1.35rem; font-weight: 700; line-height: 1.45; text-align: right;
+      background: #fff; border: 2px solid #bbf7d0; border-radius: 12px; padding: 14px 20px;
+      margin: 8px auto; display: inline-block; min-width: 180px; color: #14532d;
+    }
+    .calc-box .row { display: block; letter-spacing: 0.12em; }
+    .calc-box .op { color: #15803d; }
+    .calc-box .line { border-bottom: 2.5px solid #166534; margin: 4px 0 6px; width: 100%; }
+    .calc-box .carry { font-size: 0.85rem; color: #dc2626; letter-spacing: 0.35em; text-align: right; height: 1.2em; }
+    .calc-box .result { color: #0f766e; }
+    .chat-box {
+      background: #f8fafc; border-radius: 14px; padding: 12px; height: 280px; max-height: 280px;
+      overflow-y: auto; margin-bottom: 12px; border: 1px solid #e2e8f0; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+    }
+    .msg { margin-bottom: 10px; padding: 11px 14px; border-radius: 14px; max-width: 96%; animation: fadeSlideIn 0.35s ease; font-size: 0.95rem; line-height: 1.55; }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .msg.ai { background: #dbeafe; color: #1e40af; border-bottom-left-radius: 4px; }
+    .msg.read { background: #e0f2fe; color: #0c4a6e; border: 1px solid #7dd3fc; }
+    .msg.part { background: #fef9c3; color: #854d0e; border: 1px solid #facc15; font-weight: 700; text-align: center; }
+    .msg.key { background: #f0fdf4; border: 2px solid #16a34a; color: #14532d; font-weight: 700; font-size: 1.05rem; text-align: center; padding: 12px 16px; }
+    .msg.conclusion { background: #ecfdf5; border: 2px solid #10b981; color: #065f46; font-weight: 600; padding: 12px 14px; }
+    .msg.lesson { background: #f5f3ff; border: 1px solid #8b5cf6; color: #5b21b6; font-size: 0.92rem; padding: 12px 14px; }
+    .controls { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .controls-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .controls-row.main button { flex: 1 1 140px; min-height: 52px; font-size: 1.05rem; }
+    .controls-row.sub button { flex: 1 1 100px; min-height: 46px; font-size: 0.9rem; }
+    button {
+      padding: 12px 16px; border: none; border-radius: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      touch-action: manipulation; user-select: none;
+    }
+    button.primary { background: var(--primary); color: white; }
+    button.primary:hover:not(:disabled), button.primary:active:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    button.secondary { background: #e2e8f0; color: #334155; }
+    button.secondary:hover:not(:disabled), button.secondary:active:not(:disabled) { background: #cbd5e1; }
+    button.danger { background: #fee2e2; color: var(--danger); }
+    button.danger:hover:not(:disabled), button.danger:active:not(:disabled) { background: #fecaca; }
+    button:disabled { opacity: 0.42; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    .step-indicator { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .step { padding: 5px 11px; border-radius: 20px; font-size: 0.78rem; background: #e2e8f0; color: var(--muted); font-weight: 500; transition: all 0.3s ease; }
+    .step.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35); }
+    .step.done { background: #22c55e; color: white; }
+    .note { font-size: 0.8rem; color: var(--muted); margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1; line-height: 1.45; }
+    .voice-status { font-size: 0.84rem; color: #059669; margin-bottom: 8px; display: none; align-items: center; gap: 6px; }
+    .voice-status.show { display: flex; }
+    .audio-area {
+      background: #f0fdf4; border: 1px dashed #86efac; border-radius: 12px; padding: 10px 14px;
+      margin-bottom: 12px; display: none;
+    }
+    .audio-area.active { display: block; }
+    .audio-area .label { font-size: 0.78rem; color: #15803d; margin-bottom: 6px; font-weight: 600; }
+    .audio-area audio { width: 100%; height: 36px; border-radius: 8px; }
+    .audio-area .hint { font-size: 0.72rem; color: #64748b; margin-top: 4px; }
+    @media (max-width: 480px) {
+      body { padding: 10px; padding-bottom: calc(10px + var(--safe-bottom)); }
+      .card { padding: 14px; border-radius: 14px; }
+      h1 { font-size: 1.15rem; }
+      .subtitle { font-size: 0.82rem; margin-bottom: 12px; }
+      .de-bai { font-size: 0.9rem; padding: 10px 12px; min-height: 64px; }
+      .chat-box { height: 240px; max-height: 240px; padding: 10px; }
+      .msg { font-size: 0.92rem; padding: 10px 12px; }
+      .calc-box { font-size: 1.2rem; padding: 12px 16px; }
+      .controls-row.main button { min-height: 54px; font-size: 1.08rem; }
+      .controls-row.sub button { min-height: 46px; }
+      .step { font-size: 0.74rem; padding: 4px 9px; }
+    }
+    @media (max-width: 360px) {
+      .controls-row.main button { flex: 1 1 100%; }
+      .controls-row.sub button { flex: 1 1 45%; }
+    }
+    /* ===== TỐI ƯU CỠ CHỮ: điện thoại trước, rồi đến máy tính ===== */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body { line-height: 1.6; }
+    h1 { font-size: 1.45rem; }
+    .subtitle { font-size: 1rem; }
+    .problem-nav button { font-size: 1.05rem; min-height: 48px; }
+    .de-bai { font-size: 1.2rem; line-height: 1.8; padding: 14px 16px; }
+    .step { font-size: 1rem; padding: 6px 13px; }
+    .chat-box { height: 62vh; height: 62dvh; min-height: 340px; max-height: 620px; padding: 12px; }
+    .msg { font-size: 1.12rem; line-height: 1.65; padding: 12px 14px; }
+    .msg.key { font-size: 1.22rem; }
+    .msg.conclusion { font-size: 1.15rem; }
+    .msg.lesson { font-size: 1.08rem; }
+    .calc-box { font-size: 1.7rem; }
+    .calc-box .carry { font-size: 1rem; }
+    .controls-row.main button { font-size: 1.15rem; min-height: 56px; }
+    .controls-row.sub button { font-size: 1.02rem; min-height: 50px; }
+    .note { font-size: 1rem; }
+    .voice-status { font-size: 0.95rem; }
+    .audio-area .label { font-size: 0.9rem; }
+    .audio-area .hint { font-size: 0.85rem; }
+    .chain { font-size: 1.15rem; }
+    .crow .ex { min-width: 0; }
+    .why { font-size: 1.02rem; line-height: 1.6; }
+    .fm .fx { font-size: 1.12rem; }
+    .fm .tag { font-size: 0.95rem; }
+    .think, .warn { font-size: 1.05rem; line-height: 1.75; }
+    .legend { font-size: 0.98rem; }
+    .cases { font-size: 1.12rem; }
+    .proof { font-size: 1.1rem; }
+    .ub .ubl { font-size: 0.85em; }
+    .frac { max-width: 100%; }
+    .frac .n, .frac .d { white-space: normal; }
+    @media (max-width: 380px) { .chain { font-size: 1.05rem; } .msg.key { font-size: 1.15rem; } }
+    @media (min-width: 900px) {
+      html { font-size: 112.5%; }
+      body { max-width: 1000px; }
+      .chat-box { height: 58vh; height: 58dvh; min-height: 420px; max-height: 700px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Bài toán riêng – A ⋮ 3</h1>
+  <p class="subtitle">Tính chia hết • Dấu hiệu chia hết cho 3 • Thử ví dụ nhỏ để tìm quy luật</p>
+
+  <div class="problem-nav" id="problemNav">
+    <button class="active" data-p="0" onclick="selectProblem(0)">Bài riêng</button>
+  </div>
+
+  <div class="card">
+    <div class="de-bai" id="deBai"></div>
+    <div class="step-indicator" id="steps">
+      <span class="step active" data-step="0">Đọc đề</span>
+      <span class="step" data-step="1">Quan sát</span>
+      <span class="step" data-step="2">Giải từng ý</span>
+      <span class="step" data-step="3">Kết luận</span>
+      <span class="step" data-step="4">Bài học</span>
+    </div>
+    <div class="voice-status" id="voiceStatus">🔊 Đang nói...</div>
+    <div class="audio-area" id="audioArea">
+      <div class="label">🎧 Audio bài giảng (giọng trả phí)</div>
+      <audio id="paidAudio" controls preload="none">Trình duyệt không hỗ trợ audio.</audio>
+      <div class="hint">File audio sẽ được gắn tự động theo từng bước. Hiện đang dùng giọng trình duyệt.</div>
+    </div>
+    <div class="figure-area" id="figureArea"></div>
+    <div class="chat-box" id="chat"></div>
+    <div class="controls">
+      <div class="controls-row main">
+        <button class="primary" id="btnStart" onclick="startLesson()">▶ Bắt đầu</button>
+      </div>
+      <div class="controls-row sub">
+        <button class="secondary" id="btnPause" onclick="togglePause()" disabled>⏸ Dừng nói</button>
+        <button class="danger" onclick="resetLesson()">↺ Làm lại</button>
+      </div>
+    </div>
+    <p class="note">
+      Bài riêng — chỉ dùng kiến thức lớp 6 (cấu tạo số, dấu hiệu chia hết cho 3, tính chất chia hết của một tổng), dạng của Chương 2; chưa tính vào tiến độ.<br>
+      Màn hình chính: ý chính + chữ số. Phép tính dạng cột như SGK.<br>
+      🎧 Khung Audio trả phí đã sẵn sàng – đặt USE_PAID_AUDIO = true và khai báo AUDIO_MAP khi có file.
+    </p>
+  </div>
+
+  <script>
+    const USE_PAID_AUDIO = false;
+    const AUDIO_MAP = {};
+
+    const F = (n, d) => `<span class="frac"><span class="n">${n}</span><span class="d">${d}</span></span>`;
+    const HL = x => `<span class="hl">${x}</span>`;
+    const RS = x => `<span class="res">${x}</span>`;
+    const FI = x => `<span class="fmi">${x}</span>`;
+    const FM = x => `<div class="fm"><span class="tag">📐 Công thức / tính chất</span><span class="fx">${x}</span></div>`;
+    const TH = x => `<div class="think">💭 ${x}</div>`;
+    const WARN = x => `<div class="warn">${x}</div>`;
+    const UB = (t, l) => `<span class="ub"><span class="ubt">${t}</span><span class="ubb"></span><span class="ubl">${l}</span></span>`;
+    const CASES = rows => `<div class="cases">` + rows.map(r => `<div>${r}</div>`).join('') + `</div>`;
+    const CH = rows => `<div class="chain">` + rows.map((r, i) =>
+      `<div class="crow">${i > 0 ? '<span class="eq">=</span>' : ''}<span class="ex">${r[0]}</span></div>` +
+      (r[1] ? `<div class="why">↳ ${r[1]}</div>` : '')).join('') + `</div>`;
+    const LEGEND = `<div class="legend"><b>Cách đọc màu trên màn hình:</b>&nbsp; ${FI('tím = công thức / tính chất')} &nbsp;${HL('vàng = phần cần chú ý')} &nbsp;${RS('xanh lá = kết quả mới')} &nbsp;<span class="lg-note">↳ chữ xanh dương nhỏ = lý do làm bước đó</span></div>`;
+    const S99 = `9 + 99 + … + 99…9`;
+
+    const PROBLEMS = [
+      {
+        title: "Bài riêng",
+        deBai: `<b>Đề bài.</b> Cho A = 2n + ${UB('11…1', 'n số 1')} &nbsp;(n ∈ N*).<br>Chứng minh rằng A chia hết cho 3.`,
+        figure: LEGEND,
+        speakRead: "Nghe đề nha: cho A bằng hai n, cộng với một số rất dài toàn chữ số một, có đúng n chữ số một xếp hàng ngang, và n là số tự nhiên khác không. Cô yêu cầu chứng minh A chia hết cho ba. Nhìn qua thì dãy số một dài dằng dặc, mà n lại chẳng biết là bao nhiêu, nghe là muốn hỏi: ủa, không biết n thì làm sao mà chia? Nhưng đừng sợ, cô sẽ chỉ cho các em cách biến n từ kẻ lạ mặt thành người bạn. Và cô lưu ý về màu sắc trên màn hình: màu tím là công thức hoặc tính chất, màu vàng là chỗ cần chú ý, màu xanh lá là kết quả mới, còn dòng chữ xanh dương nhỏ bên dưới là lý do vì sao ta làm bước đó.",
+        speakObs: "Quan sát trước khi xuống tay. Điều thứ nhất: đề bài bắt chứng minh với mọi n, nên ta không thể ngồi tính từng trường hợp. Điều thứ hai, rất đáng chú ý: chữ n xuất hiện hai lần, một lần trong hai n, một lần là số lượng chữ số một. Hai chữ n ăn khớp với nhau như thế thường là một gợi ý rằng số toàn chữ số một kia sẽ chứa một n bên trong. Điều thứ ba: cái đích là chia hết cho ba, nên ta sẽ nghĩ tới dấu hiệu chia hết cho ba và tính chất chia hết của một tổng. Ta bắt đầu bằng cách thử vài giá trị nhỏ.",
+        parts: [
+          {
+            label: "Bước 1 — Thử vài giá trị n nhỏ để tìm quy luật",
+            speakLabel: "Bước một: thử với n nhỏ, giống như thử áo trước khi may.",
+            lines: [
+              {
+                text: TH(`n có thể là 1, 2, 3, … hay tới một triệu, nên ta chưa thể tính trực tiếp. Nhưng thử vài giá trị nhỏ giống như "thử áo trước khi may": nó giúp ta đoán ra quy luật.`)
+                  + CASES([
+                    `n = 1: A = 2·1 + 1 = 3 = 3·1 ✓`,
+                    `n = 2: A = 2·2 + 11 = 4 + 11 = 15 = 3·5 ✓`,
+                    `n = 3: A = 2·3 + 111 = 6 + 111 = 117 = 3·39 ✓`,
+                    `n = 4: A = 2·4 + 1111 = 8 + 1111 = 1119 = 3·373 ✓`
+                  ])
+                  + FM(`Số có tổng các chữ số chia hết cho 3 thì chia hết cho 3`)
+                  + TH(`Kiểm tra nhanh bằng dấu hiệu: 117 có 1 + 1 + 7 = 9 ⋮ 3; 1119 có 1 + 1 + 1 + 9 = 12 ⋮ 3 ✓`),
+                speak: "Vì n có thể là một, hai, ba, hay tới một triệu, nên ta chưa thể tính trực tiếp. Nhưng thử vài giá trị nhỏ giống như thử áo trước khi may, nó giúp ta đoán ra quy luật. Với n bằng một: A bằng hai nhân một cộng một, bằng ba, chia hết cho ba. Với n bằng hai: A bằng bốn cộng mười một, bằng mười lăm, bằng ba nhân năm. Với n bằng ba: A bằng sáu cộng một trăm mười một, bằng một trăm mười bảy, bằng ba nhân ba mươi chín. Với n bằng bốn: A bằng tám cộng một nghìn một trăm mười một, bằng một nghìn một trăm mười chín, bằng ba nhân ba trăm bảy mươi ba. Ta cũng có thể kiểm tra nhanh bằng dấu hiệu chia hết cho ba: số có tổng các chữ số chia hết cho ba thì chia hết cho ba. Một trăm mười bảy có tổng chữ số là chín, một nghìn một trăm mười chín có tổng chữ số là mười hai, đều chia hết cho ba."
+              },
+              {
+                text: WARN(`⚠ Thử vài trường hợp chỉ giúp DỰ ĐOÁN, chưa phải chứng minh! Vì n còn vô số giá trị khác (5, 6, 100, …), ta cần một lý do đúng với MỌI n.`),
+                speak: "Cô cảnh báo một điều quan trọng. Thử vài trường hợp chỉ giúp dự đoán, chưa phải là chứng minh. Vì n còn vô số giá trị khác như năm, sáu, một trăm, và cứ thế. Ta cần một lý do đúng với mọi n."
+              },
+              {
+                text: TH(`Soi kỹ ví dụ n = 3, xem số 111 "chứa" gì bên trong:`)
+                  + CH([
+                    [`111`, ''],
+                    [`100 + 10 + 1`, `cấu tạo số: 1 trăm + 1 chục + 1 đơn vị`],
+                    [`(99 + 1) + (9 + 1) + 1`, `viết 100 = 99 + 1 và 10 = 9 + 1`],
+                    [`99 + 9 + (1 + 1 + 1)`, `gom các số 1 lại với nhau`],
+                    [`99 + 9 + ${RS('3')}`, `số 3 này chính là ${HL('n = 3')} — vì 111 có đúng 3 chữ số 1!`]
+                  ])
+                  + TH(`Vậy 111 = 3 + (99 + 9), trong đó 99 và 9 đều chia hết cho 3. Khi đó A = 2·3 + 3 + (99 + 9) = 3·3 + (99 + 9): một phần là 3·n, phần còn lại toàn số chia hết cho 3.`),
+                speak: "Bây giờ soi kỹ ví dụ n bằng ba, xem số một trăm mười một chứa gì bên trong. Một trăm mười một bằng một trăm cộng mười cộng một, theo cấu tạo số. Viết một trăm bằng chín mươi chín cộng một, và mười bằng chín cộng một. Gom các số một lại với nhau, ta được chín mươi chín cộng chín cộng ba. Số ba này chính là n, vì số một trăm mười một có đúng ba chữ số một. Vậy một trăm mười một bằng ba cộng chín mươi chín cộng chín, trong đó chín mươi chín và chín đều chia hết cho ba. Khi đó A bằng hai nhân ba, cộng ba, cộng chín mươi chín cộng chín, tức là ba nhân ba, cộng chín mươi chín cộng chín: một phần là ba nhân n, phần còn lại toàn số chia hết cho ba."
+              }
+            ],
+            conclusion: { text: `✓ Dự đoán: 11…1 (n số 1) = n + (những số 9, 99, … đều ⋮ 3)`, speak: "Kết luận bước một: ta dự đoán số gồm n chữ số một bằng n cộng với những số như chín, chín mươi chín, đều chia hết cho ba. Bây giờ phải chứng minh điều đó cho mọi n." }
+          },
+          {
+            label: "Bước 2 — Làm cho n bất kì: tách số 11…1",
+            speakLabel: "Bước hai: làm y hệt như với một trăm mười một, nhưng cho n bất kì.",
+            lines: [
+              {
+                text: TH(`Làm y như với 111, chỉ khác là dãy số dài hơn và có n chữ số 1. Ký hiệu "…" nghĩa là cứ tiếp tục theo đúng quy luật.`)
+                  + CH([
+                    [`${UB('11…1', 'n số 1')}`, ''],
+                    [`1 + 10 + 100 + … + ${UB('100…0', 'n−1 số 0')}`, `cấu tạo số: một chữ số 1 ở hàng đơn vị, một ở hàng chục, một ở hàng trăm, …, một ở hàng cao nhất`],
+                    [`1 + (9 + 1) + (99 + 1) + … + (99…9 + 1)`, `viết 10 = 9 + 1, 100 = 99 + 1, …, và 100…0 = 99…9 + 1 (số 99…9 có n−1 chữ số 9)`],
+                    [`(1 + 1 + 1 + … + 1) + (${S99})`, `gom tất cả các số 1 lại thành một nhóm, các số 9, 99, … thành nhóm còn lại`],
+                    [RS(`n + (${S99})`), `nhóm các số 1 có đúng ${HL('n số 1')}: số 1 ở đầu, cộng n − 1 số 1 vừa tách ra từ các số 10, 100, …`]
+                  ]),
+                speak: "Bây giờ làm y như với một trăm mười một, chỉ khác là dãy số dài hơn, có n chữ số một. Ký hiệu ba chấm nghĩa là cứ tiếp tục theo đúng quy luật. Bắt đầu từ số gồm n chữ số một. Theo cấu tạo số, nó bằng một cộng mười cộng một trăm cộng, và cứ thế, cho tới số một đi kèm n trừ một chữ số không. Viết mười bằng chín cộng một, một trăm bằng chín mươi chín cộng một, và số cuối cùng bằng số gồm n trừ một chữ số chín, cộng một. Rồi gom tất cả các số một lại thành một nhóm, còn các số chín, chín mươi chín, và cứ thế lại thành nhóm còn lại. Nhóm các số một có đúng n số một: một số một ở đầu, cộng n trừ một số một vừa tách ra từ mười, một trăm, và cứ thế. Vậy số gồm n chữ số một bằng n cộng, ngoặc, chín cộng chín mươi chín cộng, và cứ thế, cộng số gồm n trừ một chữ số chín."
+              },
+              {
+                text: TH(`Còn một câu hỏi: vì sao các số 9, 99, …, 99…9 đều chia hết cho 3? Dùng dấu hiệu chia hết cho 3:`)
+                  + FM(`Số có tổng các chữ số chia hết cho 3 thì chia hết cho 3`)
+                  + TH(`Số 99…9 có k chữ số 9 thì tổng các chữ số là 9·k = 3·(3k), chia hết cho 3 → 99…9 ⋮ 3. Ví dụ: 9 (tổng 9), 99 (tổng 18), 999 (tổng 27) — đều chia hết cho 3.`),
+                speak: "Còn một câu hỏi: vì sao các số chín, chín mươi chín, và cứ thế đều chia hết cho ba? Ta dùng dấu hiệu chia hết cho ba: số có tổng các chữ số chia hết cho ba thì chia hết cho ba. Số gồm k chữ số chín có tổng các chữ số là chín nhân k, bằng ba nhân ba k, nên chia hết cho ba. Ví dụ chín có tổng là chín, chín mươi chín có tổng là mười tám, chín trăm chín mươi chín có tổng là hai mươi bảy, đều chia hết cho ba."
+              }
+            ],
+            conclusion: { text: `✓ 11…1 (n số 1) = n + (${S99}), mỗi số hạng trong ngoặc đều ⋮ 3`, speak: "Kết luận bước hai: số gồm n chữ số một bằng n cộng một tổng các số chín, chín mươi chín, và cứ thế, mỗi số hạng trong tổng đều chia hết cho ba." }
+          },
+          {
+            label: "Bước 3 — Ghép vào A và kết luận",
+            speakLabel: "Bước ba: thay kết quả vào A.",
+            lines: [
+              {
+                text: CH([
+                  [`A = 2n + ${HL(UB('11…1', 'n số 1'))}`, ''],
+                  [`2n + ${RS(`[n + (${S99})]`)}`, `thay 11…1 bằng kết quả ở bước 2`],
+                  [`(2n + n) + (${S99})`, `gom hai số hạng chứa n lại với nhau`],
+                  [`3n + (${S99})`, `2n + n = 3n`]
+                ]),
+                speak: "Thay vào A. A bằng hai n cộng số gồm n chữ số một. Phần tô vàng là số toàn chữ số một, ta thay bằng kết quả ở bước hai: n cộng tổng các số chín, chín mươi chín, và cứ thế. Gom hai số hạng chứa n lại với nhau: hai n cộng n bằng ba n. Vậy A bằng ba n, cộng tổng các số chín, chín mươi chín, và cứ thế."
+              },
+              {
+                text: FM(`Nếu a ⋮ 3 và b ⋮ 3 thì (a + b) ⋮ 3 &nbsp;(mở rộng cho nhiều số hạng)`)
+                  + TH(`• 3n có thừa số 3 → 3n ⋮ 3.<br>• Mỗi số 9, 99, …, 99…9 đều ⋮ 3 (bước 2) → cả tổng (${S99}) ⋮ 3.<br>• Một tổng của hai số cùng chia hết cho 3 thì chia hết cho 3.`)
+                  + `<div class="proof">Vậy A = 3n + (${S99}) chia hết cho 3 với mọi n ∈ N*. ∎</div>`,
+                speak: "Bây giờ kết luận. Ta dùng tính chất: nếu hai số cùng chia hết cho ba thì tổng của chúng cũng chia hết cho ba, và tính chất này mở rộng được cho nhiều số hạng. Số ba n có thừa số ba, nên chia hết cho ba. Mỗi số chín, chín mươi chín, và cứ thế đều chia hết cho ba theo bước hai, nên cả tổng cũng chia hết cho ba. Một tổng của hai số cùng chia hết cho ba thì chia hết cho ba. Vậy A bằng ba n cộng tổng đó chia hết cho ba với mọi n thuộc N sao. Chứng minh xong!"
+              },
+              {
+                text: TH(`🔎 Trường hợp nhỏ nhất n = 1: khi đó 11…1 chỉ là một số 1, nhóm (${S99}) không có số hạng nào (coi như bằng 0). Công thức vẫn đúng: A = 3·1 + 0 = 3 ⋮ 3 ✓ — khớp với ví dụ ở bước 1.`),
+                speak: "Cô kiểm tra thêm trường hợp nhỏ nhất, n bằng một. Khi đó số toàn chữ số một chỉ là số một, nhóm các số chín không có số hạng nào, coi như bằng không. Công thức vẫn đúng: A bằng ba nhân một cộng không, bằng ba, chia hết cho ba, khớp với ví dụ ở bước một."
+              }
+            ],
+            conclusion: { text: `✓ A = 3n + (${S99}) ⋮ 3 với mọi n ∈ N*`, speak: "Kết luận bước ba: A bằng ba n cộng tổng các số chín, chín mươi chín, và cứ thế, chia hết cho ba với mọi n." }
+          },
+          {
+            label: "Bước 4 — Nhìn lại: vì sao đề chọn hệ số 2, và cách nghĩ nhanh",
+            speakLabel: "Bước bốn, để hiểu sâu hơn: vì sao đề lại là hai n?",
+            lines: [
+              {
+                text: TH(`Ta vừa thấy 11…1 = n + (bội của 3), nghĩa là 11…1 và n chia cho 3 có <b>cùng số dư</b>. Đây chính là lý do dấu hiệu chia hết cho 3 hoạt động: tổng các chữ số của 11…1 chính là n!`)
+                  + TH(`Cách nghĩ nhanh: A = 2n + 11…1 có số dư giống 2n + n = 3n → chia hết cho 3.`),
+                speak: "Ta vừa thấy số gồm n chữ số một bằng n cộng một bội của ba, nghĩa là số đó và n khi chia cho ba có cùng số dư. Đây chính là lý do dấu hiệu chia hết cho ba hoạt động: tổng các chữ số của số toàn chữ số một chính là n. Từ đó có một cách nghĩ nhanh: A bằng hai n cộng số toàn chữ số một có số dư giống hai n cộng n, bằng ba n, nên chia hết cho ba."
+              },
+              {
+                text: TH(`❓ Vì sao đề chọn hệ số 2? Thử đổi đề: B = n + 11…1. Với n = 1: B = 1 + 1 = 2 — không chia hết cho 3! Còn với hệ số 2: 2n + n = 3n, vừa khít bội của 3. Vì vậy hệ số 2 là "chìa khóa" của đề.`),
+                speak: "Một câu hỏi thú vị: vì sao đề chọn hệ số hai? Thử đổi đề thành B bằng n cộng số toàn chữ số một. Với n bằng một, B bằng một cộng một, bằng hai, không chia hết cho ba. Còn với hệ số hai, hai n cộng n bằng ba n, vừa khít một bội của ba. Vì vậy hệ số hai chính là chìa khóa của đề."
+              }
+            ],
+            conclusion: { text: `✓ 11…1 (n số 1) và n cùng số dư khi chia cho 3`, speak: "Kết luận bước bốn: số gồm n chữ số một và n cùng số dư khi chia cho ba." }
+          }
+        ],
+        finalAnswer: `<div class="proof" style="text-align:left;font-weight:600;line-height:1.9">Ta có:<br>11…1 (n số 1) = 1 + 10 + 100 + … + 100…0 (n−1 số 0)<br>= 1 + (9 + 1) + (99 + 1) + … + (99…9 + 1)<br>= (1 + 1 + … + 1) + (${S99}) = n + (${S99}).<br>Suy ra A = 2n + n + (${S99}) = 3n + (${S99}).<br>Vì 3n ⋮ 3 và mỗi số 9, 99, …, 99…9 đều ⋮ 3 (tổng các chữ số chia hết cho 3) nên A ⋮ 3. ∎</div>`,
+        speakFinal: "Tổng kết, đây là bài giải trình bày gọn để các em chép vào vở. Số gồm n chữ số một bằng n cộng tổng các số chín, chín mươi chín, và cứ thế. Suy ra A bằng ba n cộng tổng đó. Vì ba n chia hết cho ba, và mỗi số chín, chín mươi chín, và cứ thế đều chia hết cho ba, nên A chia hết cho ba.",
+        lesson: `💡 Bốn bài học: (1) Đề cho n bất kì thì không tính trực tiếp được — hãy thử n nhỏ để tìm quy luật, nhưng nhớ: thử ≠ chứng minh. (2) Mẹo kinh điển với 11…1: tách 1 + 10 + 100 + … rồi viết 10 = 9 + 1, 100 = 99 + 1, … để "rút" ra phần n và phần chia hết cho 3 (cũng dùng được cho 9). (3) Muốn chứng minh chia hết: đưa về tổng các số hạng mà mỗi số hạng đều chia hết. (4) Đừng quên kiểm tra trường hợp nhỏ nhất n = 1. Và nhớ: dãy số dài dằng dặc thường chỉ đang hù dọa thôi!`,
+        speakLesson: "Bài học rút ra, có bốn điều. Một: khi đề cho n bất kì thì không tính trực tiếp được, hãy thử n nhỏ để tìm quy luật, nhưng nhớ thử không phải là chứng minh. Hai: mẹo kinh điển với số toàn chữ số một là tách một cộng mười cộng một trăm và cứ thế, rồi viết mười bằng chín cộng một, một trăm bằng chín mươi chín cộng một, để rút ra phần n và phần chia hết cho ba, mẹo này dùng được cho cả chín. Ba: muốn chứng minh chia hết, hãy đưa về tổng các số hạng mà mỗi số hạng đều chia hết. Bốn: đừng quên kiểm tra trường hợp nhỏ nhất n bằng một. Và nhớ nhé, dãy số dài dằng dặc thường chỉ đang hù dọa thôi."
+      }
+    ];
+
+    // Vẽ dấu căn có gạch ngang phủ HẾT biểu thức dưới căn (để học sinh không hiểu nhầm phạm vi của căn)
+    function fmtRad(str) {
+      let out = "", i = 0;
+      while (i < str.length) {
+        const ch = str[i];
+        if (ch !== "√") { out += ch; i++; continue; }
+        let j = i + 1, inner = "";
+        if (str[j] === "(") {
+          let depth = 0, k = j;
+          for (; k < str.length; k++) {
+            if (str[k] === "(") depth++;
+            else if (str[k] === ")") { depth--; if (depth === 0) break; }
+          }
+          inner = str.slice(j + 1, k);
+          j = k + 1;
+        } else {
+          let k = j;
+          while (k < str.length && /[0-9A-Za-z]/.test(str[k])) k++;
+          inner = str.slice(j, k);
+          j = k;
+        }
+        out += `<span class="rad"><span class="rs">√</span><span class="rc">${fmtRad(inner)}</span></span>`;
+        i = j;
+      }
+      return out;
+    }
+    const nb = str => str.replace(/(99…9|11…1|100…0)/g, '<span class="nb">$1</span>');
+    PROBLEMS.forEach(p => {
+      p.deBai = nb(fmtRad(p.deBai));
+      p.finalAnswer = nb(fmtRad(p.finalAnswer));
+      p.lesson = nb(fmtRad(p.lesson));
+      p.parts.forEach(pt => {
+        pt.label = nb(fmtRad(pt.label));
+        pt.lines.forEach(l => { l.text = nb(fmtRad(l.text)); });
+        pt.conclusion.text = nb(fmtRad(pt.conclusion.text));
+      });
+    });
+
+    let currentProblem = 0, currentStep = -1, speaking = false, paused = false, flowRunning = false;
+    let phraseQueue = [], phraseIndex = 0, phraseResolve = null, usingPaidAudio = false;
+    const doneProblems = new Set();
+
+    const chat = document.getElementById("chat");
+    const voiceStatus = document.getElementById("voiceStatus");
+    const btnStart = document.getElementById("btnStart");
+    const btnPause = document.getElementById("btnPause");
+    const deBai = document.getElementById("deBai");
+    const figureArea = document.getElementById("figureArea");
+    const audioArea = document.getElementById("audioArea");
+    const paidAudio = document.getElementById("paidAudio");
+
+    function getVietnameseVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      let vi = voices.find(v => (v.lang === "vi-VN" || v.lang.startsWith("vi")) && /female|nữ|linh|mai|hoaimy|my|woman|google/i.test(v.name));
+      if (!vi) vi = voices.find(v => v.lang === "vi-VN" || v.lang.startsWith("vi"));
+      if (!vi) vi = voices.find(v => /vietnam|linh|mai|vietnamese/i.test(v.name));
+      return vi || null;
+    }
+
+    function splitPhrases(text) {
+      if (!text || !text.trim()) return [];
+      const parts = text.split(/(?<=[.?!;])\s+/).map(s => s.trim()).filter(s => s.length > 0);
+      if (parts.length === 1 && parts[0].length > 80) {
+        return parts[0].split(/(?<=,)\s+/).map(s => s.trim()).filter(s => s.length > 0);
+      }
+      return parts.length ? parts : [text.trim()];
+    }
+
+    function speakNextPhrase() {
+      if (paused) return;
+      if (phraseIndex >= phraseQueue.length) {
+        speaking = false; phraseQueue = []; phraseIndex = 0;
+        voiceStatus.classList.remove("show");
+        btnPause.disabled = true; btnPause.textContent = "⏸ Dừng nói";
+        const resolve = phraseResolve; phraseResolve = null;
+        if (resolve) setTimeout(resolve, 300);
+        return;
+      }
+      const text = phraseQueue[phraseIndex];
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "vi-VN"; u.rate = 0.76; u.pitch = 1.08; u.volume = 1;
+      const vi = getVietnameseVoice(); if (vi) u.voice = vi;
+      speaking = true;
+      voiceStatus.classList.add("show");
+      voiceStatus.textContent = vi ? `🔊 ${vi.name}` : "🔊 Đang nói...";
+      btnPause.disabled = false; btnPause.textContent = "⏸ Dừng nói";
+      u.onend = () => { if (paused) return; phraseIndex++; setTimeout(speakNextPhrase, 180); };
+      u.onerror = () => { if (paused) return; phraseIndex++; setTimeout(speakNextPhrase, 100); };
+      setTimeout(() => { if (!paused) window.speechSynthesis.speak(u); }, 60);
+    }
+
+    function speak(text) {
+      return new Promise((resolve) => {
+        if (!window.speechSynthesis) { resolve(); return; }
+        usingPaidAudio = false; audioArea.classList.remove("active");
+        phraseQueue = splitPhrases(text); phraseIndex = 0; phraseResolve = resolve; paused = false;
+        if (window.speechSynthesis.getVoices().length === 0) {
+          window.speechSynthesis.onvoiceschanged = () => speakNextPhrase();
+          setTimeout(speakNextPhrase, 280);
+        } else speakNextPhrase();
+      });
+    }
+
+    function togglePause() {
+      if (!phraseResolve && !paused && !speaking) return;
+      if (!paused) {
+        paused = true;
+        if (usingPaidAudio) paidAudio.pause(); else window.speechSynthesis.cancel();
+        speaking = false; voiceStatus.classList.remove("show");
+        btnPause.textContent = "▶ Tiếp tục"; btnPause.disabled = false;
+      } else {
+        paused = false; btnPause.textContent = "⏸ Dừng nói";
+        if (usingPaidAudio) {
+          paidAudio.play(); speaking = true;
+          voiceStatus.classList.add("show"); voiceStatus.textContent = "🎧 Audio trả phí";
+        } else speakNextPhrase();
+      }
+    }
+
+    function stopSpeakCompletely() {
+      paused = false;
+      if (usingPaidAudio) { paidAudio.pause(); paidAudio.currentTime = 0; usingPaidAudio = false; }
+      window.speechSynthesis.cancel(); speaking = false;
+      phraseQueue = []; phraseIndex = 0;
+      if (phraseResolve) { const r = phraseResolve; phraseResolve = null; r(); }
+      voiceStatus.classList.remove("show"); audioArea.classList.remove("active");
+      btnPause.disabled = true; btnPause.textContent = "⏸ Dừng nói";
+    }
+
+    function addMsg(content, type = "ai") {
+      const div = document.createElement("div");
+      div.className = `msg ${type}`;
+      if (typeof content === "string" && (content.includes("<div") || content.includes("<span") || content.includes("<br") || content.includes("<sup") || content.includes("&lt;"))) {
+        div.innerHTML = content;
+      } else div.textContent = content;
+      chat.appendChild(div);
+      requestAnimationFrame(() => chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }));
+      return div;
+    }
+
+    function setStep(n) {
+      document.querySelectorAll(".step").forEach(s => {
+        s.classList.remove("active", "done");
+        const sn = parseInt(s.dataset.step);
+        if (sn < n) s.classList.add("done");
+        if (sn === n) s.classList.add("active");
+      });
+    }
+
+    function selectProblem(idx) {
+      stopSpeakCompletely(); flowRunning = false; currentProblem = idx;
+      document.querySelectorAll(".problem-nav button").forEach((b, i) => b.classList.toggle("active", i === idx));
+      loadProblem(); resetLesson();
+    }
+
+    function loadProblem() {
+      const p = PROBLEMS[currentProblem];
+      deBai.innerHTML = p.deBai;
+      if (p.figure) { figureArea.innerHTML = p.figure; figureArea.classList.remove("hidden"); }
+      else { figureArea.innerHTML = ""; figureArea.classList.add("hidden"); }
+    }
+
+    async function startLesson() {
+      if (flowRunning) return;
+      flowRunning = true;
+      if (window.speechSynthesis) { const warm = new SpeechSynthesisUtterance(" "); warm.volume = 0; window.speechSynthesis.speak(warm); }
+      btnStart.disabled = true; chat.innerHTML = ""; currentStep = 0; setStep(0); paused = false;
+      const p = PROBLEMS[currentProblem];
+
+      addMsg("Đọc đề kỹ một lần.", "read");
+      await speak(p.speakRead);
+      if (!flowRunning) return;
+
+      currentStep = 1; setStep(1);
+      addMsg("Xác định các ý cần giải.", "ai");
+      await speak(p.speakObs);
+      if (!flowRunning) return;
+
+      currentStep = 2; setStep(2);
+      for (const part of p.parts) {
+        if (!flowRunning) return;
+        addMsg("── " + part.label + " ──", "part");
+        await speak(part.speakLabel);
+        if (!flowRunning) return;
+        for (const line of part.lines) {
+          if (!flowRunning) return;
+          addMsg(line.text, "key");
+          await speak(line.speak);
+          await new Promise(r => setTimeout(r, 280));
+        }
+        addMsg(part.conclusion.text, "conclusion");
+        await speak(part.conclusion.speak);
+        await new Promise(r => setTimeout(r, 400));
+      }
+      if (!flowRunning) return;
+
+      currentStep = 3; setStep(3);
+      addMsg(p.finalAnswer, "conclusion");
+      await speak(p.speakFinal);
+      if (!flowRunning) return;
+
+      currentStep = 4; setStep(4);
+      addMsg(p.lesson, "lesson");
+      await speak(p.speakLesson);
+
+      doneProblems.add(currentProblem);
+      document.querySelectorAll(".problem-nav button")[currentProblem].classList.add("done");
+      flowRunning = false; btnPause.disabled = true; btnStart.disabled = false;
+    }
+
+    function resetLesson() {
+      stopSpeakCompletely(); flowRunning = false; chat.innerHTML = "";
+      currentStep = -1; setStep(-1); btnStart.disabled = false;
+    }
+
+    loadProblem();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+  </script>
+</body>
+</html>

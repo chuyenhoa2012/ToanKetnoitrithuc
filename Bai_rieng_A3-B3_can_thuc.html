@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Bài riêng – A³ − B³</title>
+  <style>
+    :root {
+      --primary: #2563eb; --primary-dark: #1d4ed8; --success: #16a34a; --danger: #b91c1c;
+      --bg: #f0f4f8; --card: #ffffff; --text: #1e293b; --muted: #64748b; --radius: 16px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; overscroll-behavior: none; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      padding: 12px; padding-bottom: calc(12px + var(--safe-bottom));
+      max-width: 920px; margin: 0 auto; -webkit-font-smoothing: antialiased;
+    }
+    h1 { font-size: 1.25rem; margin-bottom: 2px; color: #0f172a; font-weight: 700; }
+    .subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 14px; }
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.07); padding: 16px; }
+    .problem-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .problem-nav button {
+      flex: 1 1 70px; min-height: 42px; padding: 8px 10px; border: 2px solid #e2e8f0;
+      border-radius: 12px; background: #fff; color: #334155; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+    }
+    .problem-nav button.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+    .problem-nav button.done { background: #dcfce7; border-color: #16a34a; color: #15803d; }
+    .de-bai {
+      background: #eff6ff; border-left: 4px solid var(--primary); padding: 12px 14px;
+      border-radius: 0 12px 12px 0; margin-bottom: 12px; font-size: 0.95rem; line-height: 1.55; min-height: 72px;
+    }
+    .figure-area {
+      display: flex; justify-content: center; background: #f8fafc; border-radius: 14px;
+      padding: 12px 10px 18px; margin-bottom: 12px; overflow: hidden; min-height: 0;
+    }
+    .figure-area.hidden { display: none; }
+    svg { max-width: 100%; height: auto; }
+    .de-bai, .msg.key, .msg.conclusion, .msg.lesson { line-height: 1.9; }
+    .chain { text-align: left; font-weight: 600; font-size: 1rem; overflow-x: auto; padding: 2px 0; }
+    .crow { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .crow .eq { color: #64748b; font-weight: 700; min-width: 14px; }
+    .crow .ex { color: #14532d; max-width: 100%; overflow-x: auto; }
+    .why { margin: 2px 0 2px 22px; font-size: 0.82rem; font-weight: 500; color: #1d4ed8; line-height: 1.55; text-align: left; }
+    .fm { background: #f5f3ff; border: 1.5px solid #7c3aed; border-radius: 10px; padding: 8px 10px; margin: 6px 0; text-align: center; color: #5b21b6; }
+    .fm .fx { font-size: 0.9rem; }
+    .fm .tag { display: block; font-size: 0.74rem; font-weight: 700; color: #7c3aed; margin-bottom: 2px; }
+    .fmi { color: #6d28d9; background: #f5f3ff; border-radius: 4px; padding: 0 4px; font-weight: 700; }
+    .hl { background: #fde68a; border-radius: 4px; padding: 0 3px; }
+    .res { display: inline-block; background: #bbf7d0; border-radius: 6px; padding: 0 4px; color: #166534; }
+    .think { text-align: left; font-weight: 500; font-size: 0.92rem; color: #334155; background: #fff7ed; border-left: 4px solid #fb923c; border-radius: 6px; padding: 6px 10px; margin: 6px 0; line-height: 1.7; }
+    .warn { text-align: left; font-weight: 600; font-size: 0.92rem; color: #991b1b; background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 6px; padding: 8px 10px; line-height: 1.7; }
+    .legend { font-size: 0.85rem; line-height: 2; text-align: center; color: #334155; }
+    .legend .lg-note { color: #1d4ed8; }
+    .rad { display: inline-block; white-space: nowrap; vertical-align: baseline; }
+    .rad .rs { display: inline-block; font-weight: 700; margin-right: 1px; }
+    .rad .rc { display: inline-block; border-top: 1.6px solid currentColor; padding: 3px 2px 0 2px; line-height: 1.25; }
+    .frac { display: inline-block; vertical-align: middle; text-align: center; margin: 4px 3px; }
+    .frac .n { display: block; border-bottom: 1.5px solid currentColor; padding: 4px 4px 4px; line-height: 1.3; }
+    .frac .d { display: block; padding: 9px 4px 2px; line-height: 1.3; }
+    .calc-box {
+      font-family: "Cambria Math", "Times New Roman", "Courier New", monospace;
+      font-size: 1.35rem; font-weight: 700; line-height: 1.45; text-align: right;
+      background: #fff; border: 2px solid #bbf7d0; border-radius: 12px; padding: 14px 20px;
+      margin: 8px auto; display: inline-block; min-width: 180px; color: #14532d;
+    }
+    .calc-box .row { display: block; letter-spacing: 0.12em; }
+    .calc-box .op { color: #15803d; }
+    .calc-box .line { border-bottom: 2.5px solid #166534; margin: 4px 0 6px; width: 100%; }
+    .calc-box .carry { font-size: 0.85rem; color: #dc2626; letter-spacing: 0.35em; text-align: right; height: 1.2em; }
+    .calc-box .result { color: #0f766e; }
+    .chat-box {
+      background: #f8fafc; border-radius: 14px; padding: 12px; height: 280px; max-height: 280px;
+      overflow-y: auto; margin-bottom: 12px; border: 1px solid #e2e8f0; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+    }
+    .msg { margin-bottom: 10px; padding: 11px 14px; border-radius: 14px; max-width: 96%; animation: fadeSlideIn 0.35s ease; font-size: 0.95rem; line-height: 1.55; }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .msg.ai { background: #dbeafe; color: #1e40af; border-bottom-left-radius: 4px; }
+    .msg.read { background: #e0f2fe; color: #0c4a6e; border: 1px solid #7dd3fc; }
+    .msg.part { background: #fef9c3; color: #854d0e; border: 1px solid #facc15; font-weight: 700; text-align: center; }
+    .msg.key { background: #f0fdf4; border: 2px solid #16a34a; color: #14532d; font-weight: 700; font-size: 1.05rem; text-align: center; padding: 12px 16px; }
+    .msg.conclusion { background: #ecfdf5; border: 2px solid #10b981; color: #065f46; font-weight: 600; padding: 12px 14px; }
+    .msg.lesson { background: #f5f3ff; border: 1px solid #8b5cf6; color: #5b21b6; font-size: 0.92rem; padding: 12px 14px; }
+    .controls { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .controls-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .controls-row.main button { flex: 1 1 140px; min-height: 52px; font-size: 1.05rem; }
+    .controls-row.sub button { flex: 1 1 100px; min-height: 46px; font-size: 0.9rem; }
+    button {
+      padding: 12px 16px; border: none; border-radius: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      touch-action: manipulation; user-select: none;
+    }
+    button.primary { background: var(--primary); color: white; }
+    button.primary:hover:not(:disabled), button.primary:active:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    button.secondary { background: #e2e8f0; color: #334155; }
+    button.secondary:hover:not(:disabled), button.secondary:active:not(:disabled) { background: #cbd5e1; }
+    button.danger { background: #fee2e2; color: var(--danger); }
+    button.danger:hover:not(:disabled), button.danger:active:not(:disabled) { background: #fecaca; }
+    button:disabled { opacity: 0.42; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    .step-indicator { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .step { padding: 5px 11px; border-radius: 20px; font-size: 0.78rem; background: #e2e8f0; color: var(--muted); font-weight: 500; transition: all 0.3s ease; }
+    .step.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35); }
+    .step.done { background: #22c55e; color: white; }
+    .note { font-size: 0.8rem; color: var(--muted); margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1; line-height: 1.45; }
+    .voice-status { font-size: 0.84rem; color: #059669; margin-bottom: 8px; display: none; align-items: center; gap: 6px; }
+    .voice-status.show { display: flex; }
+    .audio-area {
+      background: #f0fdf4; border: 1px dashed #86efac; border-radius: 12px; padding: 10px 14px;
+      margin-bottom: 12px; display: none;
+    }
+    .audio-area.active { display: block; }
+    .audio-area .label { font-size: 0.78rem; color: #15803d; margin-bottom: 6px; font-weight: 600; }
+    .audio-area audio { width: 100%; height: 36px; border-radius: 8px; }
+    .audio-area .hint { font-size: 0.72rem; color: #64748b; margin-top: 4px; }
+    @media (max-width: 480px) {
+      body { padding: 10px; padding-bottom: calc(10px + var(--safe-bottom)); }
+      .card { padding: 14px; border-radius: 14px; }
+      h1 { font-size: 1.15rem; }
+      .subtitle { font-size: 0.82rem; margin-bottom: 12px; }
+      .de-bai { font-size: 0.9rem; padding: 10px 12px; min-height: 64px; }
+      .chat-box { height: 240px; max-height: 240px; padding: 10px; }
+      .msg { font-size: 0.92rem; padding: 10px 12px; }
+      .calc-box { font-size: 1.2rem; padding: 12px 16px; }
+      .controls-row.main button { min-height: 54px; font-size: 1.08rem; }
+      .controls-row.sub button { min-height: 46px; }
+      .step { font-size: 0.74rem; padding: 4px 9px; }
+    }
+    @media (max-width: 360px) {
+      .controls-row.main button { flex: 1 1 100%; }
+      .controls-row.sub button { flex: 1 1 45%; }
+    }
+    /* ===== TỐI ƯU CỠ CHỮ: điện thoại trước, rồi đến máy tính ===== */
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body { line-height: 1.6; }
+    h1 { font-size: 1.45rem; }
+    .subtitle { font-size: 1rem; }
+    .problem-nav button { font-size: 1.05rem; min-height: 48px; }
+    .de-bai { font-size: 1.2rem; line-height: 1.8; padding: 14px 16px; }
+    .step { font-size: 1rem; padding: 6px 13px; }
+    .chat-box { height: 62vh; height: 62dvh; min-height: 340px; max-height: 620px; padding: 12px; }
+    .msg { font-size: 1.12rem; line-height: 1.65; padding: 12px 14px; }
+    .msg.key { font-size: 1.22rem; }
+    .msg.conclusion { font-size: 1.15rem; }
+    .msg.lesson { font-size: 1.08rem; }
+    .calc-box { font-size: 1.7rem; }
+    .calc-box .carry { font-size: 1rem; }
+    .controls-row.main button { font-size: 1.15rem; min-height: 56px; }
+    .controls-row.sub button { font-size: 1.02rem; min-height: 50px; }
+    .note { font-size: 1rem; }
+    .voice-status { font-size: 0.95rem; }
+    .audio-area .label { font-size: 0.9rem; }
+    .audio-area .hint { font-size: 0.85rem; }
+    .chain { font-size: 1.15rem; }
+    .crow .ex { min-width: 0; }
+    .why { font-size: 1.02rem; line-height: 1.6; }
+    .fm .fx { font-size: 1.12rem; }
+    .fm .tag { font-size: 0.95rem; }
+    .think, .warn { font-size: 1.05rem; line-height: 1.75; }
+    .legend { font-size: 0.98rem; }
+    .cases { font-size: 1.12rem; }
+    .proof { font-size: 1.1rem; }
+    .ub .ubl { font-size: 0.85em; }
+    .frac { max-width: 100%; }
+    .frac .n, .frac .d { white-space: normal; }
+    @media (max-width: 380px) { .chain { font-size: 1.05rem; } .msg.key { font-size: 1.15rem; } }
+    @media (min-width: 900px) {
+      html { font-size: 112.5%; }
+      body { max-width: 1000px; }
+      .chat-box { height: 58vh; height: 58dvh; min-height: 420px; max-height: 700px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Bài toán riêng – A³ − B³</h1>
+  <p class="subtitle">Căn thức • Trục căn thức • Hằng đẳng thức lập phương • Không thuộc chương trình lớp 6</p>
+
+  <div class="problem-nav" id="problemNav">
+    <button class="active" data-p="0" onclick="selectProblem(0)">Bài riêng</button>
+  </div>
+
+  <div class="card">
+    <div class="de-bai" id="deBai"></div>
+    <div class="step-indicator" id="steps">
+      <span class="step active" data-step="0">Đọc đề</span>
+      <span class="step" data-step="1">Quan sát</span>
+      <span class="step" data-step="2">Giải từng ý</span>
+      <span class="step" data-step="3">Kết luận</span>
+      <span class="step" data-step="4">Bài học</span>
+    </div>
+    <div class="voice-status" id="voiceStatus">🔊 Đang nói...</div>
+    <div class="audio-area" id="audioArea">
+      <div class="label">🎧 Audio bài giảng (giọng trả phí)</div>
+      <audio id="paidAudio" controls preload="none">Trình duyệt không hỗ trợ audio.</audio>
+      <div class="hint">File audio sẽ được gắn tự động theo từng bước. Hiện đang dùng giọng trình duyệt.</div>
+    </div>
+    <div class="figure-area" id="figureArea"></div>
+    <div class="chat-box" id="chat"></div>
+    <div class="controls">
+      <div class="controls-row main">
+        <button class="primary" id="btnStart" onclick="startLesson()">▶ Bắt đầu</button>
+      </div>
+      <div class="controls-row sub">
+        <button class="secondary" id="btnPause" onclick="togglePause()" disabled>⏸ Dừng nói</button>
+        <button class="danger" onclick="resetLesson()">↺ Làm lại</button>
+      </div>
+    </div>
+    <p class="note">
+      Bài riêng — dùng căn thức và hằng đẳng thức (kiến thức lớp 8–9), KHÔNG thuộc chương trình lớp 6.<br>
+      Màn hình chính: ý chính + chữ số. Phép tính dạng cột như SGK.<br>
+      🎧 Khung Audio trả phí đã sẵn sàng – đặt USE_PAID_AUDIO = true và khai báo AUDIO_MAP khi có file.
+    </p>
+  </div>
+
+  <script>
+    const USE_PAID_AUDIO = false;
+    const AUDIO_MAP = {};
+
+    const F = (n, d) => `<span class="frac"><span class="n">${n}</span><span class="d">${d}</span></span>`;
+    const HL = x => `<span class="hl">${x}</span>`;
+    const RS = x => `<span class="res">${x}</span>`;
+    const FI = x => `<span class="fmi">${x}</span>`;
+    const FM = x => `<div class="fm"><span class="tag">📐 Công thức</span><span class="fx">${x}</span></div>`;
+    const TH = x => `<div class="think">💭 ${x}</div>`;
+    const WARN = x => `<div class="warn">${x}</div>`;
+    const CH = rows => `<div class="chain">` + rows.map((r, i) =>
+      `<div class="crow">${i > 0 ? '<span class="eq">=</span>' : ''}<span class="ex">${r[0]}</span></div>` +
+      (r[1] ? `<div class="why">↳ ${r[1]}</div>` : '')).join('') + `</div>`;
+    const LEGEND = `<div class="legend"><b>Cách đọc màu trên màn hình:</b>&nbsp; ${FI('tím = công thức')} &nbsp;${HL('vàng = phần sắp bị thay')} &nbsp;${RS('xanh lá = kết quả mới')} &nbsp;<span class="lg-note">↳ chữ xanh dương nhỏ = lý do làm bước đó</span></div>`;
+
+    const PROBLEMS = [
+      {
+        title: "Bài riêng",
+        deBai: `<b>Bài riêng (ngoài chương trình lớp 6).</b> Cho A = ${F('3+√5','4+√(2(3+√5))')} ; B = ${F('3−√5','4−√(2(3−√5))')}.<br>Tính A<sup>3</sup> − B<sup>3</sup>.`,
+        figure: LEGEND,
+        speakRead: "Nghe đề nha: cô có hai anh em sinh đôi tên là A và B. Nhìn qua thì hai bạn này trông dữ dằn lắm, vì có căn nằm trong căn, rồi lại còn nằm dưới dấu chia nữa, kiểu bài nhìn vào là muốn đóng sách lại. Nhưng cô nói trước: hai bạn này chỉ đang đeo mặt nạ thôi. Bạn A là: ba cộng căn năm, trên, bốn cộng căn của hai nhân ba cộng căn năm. Bạn B thì y hệt, chỉ khác là toàn dấu trừ: ba trừ căn năm, trên, bốn trừ căn của hai nhân ba trừ căn năm. Nhiệm vụ của các em là tính A mũ ba trừ B mũ ba. Câu hỏi lớn là: có nhất thiết phải tính A, tính B thật chi tiết rồi lập phương lên không? Nghe tiếp nhé, có cách thông minh hơn nhiều. Và cô lưu ý về màu sắc trên màn hình: màu tím là công thức, màu vàng là phần sắp bị thay, màu xanh lá là kết quả mới, còn dòng chữ xanh dương nhỏ bên dưới là lý do vì sao ta làm bước đó.",
+        speakObs: "Quan sát trước khi xuống tay. Có ba điều lạ. Thứ nhất, dưới dấu căn to có hai nhân ba cộng căn năm, tức là sáu cộng hai căn năm, dạng này rất hay là bình phương của một tổng đang cải trang. Thứ hai, B chính là A với căn năm đổi dấu, hai bạn là liên hợp của nhau, nên chắc chắn sẽ có chuyện hay. Thứ ba, đề hỏi A mũ ba trừ B mũ ba chứ không hỏi A, B riêng lẻ, nghĩa là đề đang gợi ý ta dùng hằng đẳng thức. Ta đi từng bước, gỡ mặt nạ trước.",
+        parts: [
+          {
+            label: "Bước 1 — Gỡ căn trong căn của A",
+            speakLabel: "Bước một: gỡ mặt nạ cho bạn A.",
+            lines: [
+              {
+                text: TH(`Nhìn √(2(3+√5)): việc đầu tiên là nhân 2 vào ngoặc, được 6 + 2√5. Dạng "một số + 2√(một số)" rất hay là bình phương của một tổng đang cải trang.`)
+                  + FM(`(a + b)² = a² + b² + 2ab`)
+                  + TH(`So khớp với 6 + 2√5: phần 2ab = 2√5 nên thử a = 1, b = √5. Kiểm tra phần còn lại: a² + b² = 1² + (√5)² = 1 + 5 = 6 ✓ — đúng bằng số 6!`),
+                speak: "Nhìn căn của hai nhân ba cộng căn năm. Việc đầu tiên là nhân hai vào ngoặc, được sáu cộng hai căn năm. Dạng một số cộng hai căn của một số như thế này rất hay là bình phương của một tổng đang cải trang. Ta dùng công thức: a cộng b, bình phương, bằng a bình phương cộng b bình phương cộng hai a b. So khớp với sáu cộng hai căn năm: phần hai a b bằng hai căn năm, nên ta thử a bằng một, b bằng căn năm. Kiểm tra phần còn lại: a bình phương cộng b bình phương bằng một cộng năm, bằng sáu. Đúng bằng số sáu, vậy là đoán trúng rồi!"
+              },
+              {
+                text: CH([
+                  [`√(2(3+√5))`, ''],
+                  [`√(6 + 2√5)`, `nhân 2 vào ngoặc: 2·3 = 6 và 2·√5 = 2√5`],
+                  [`√(1 + 5 + 2√5)`, `tách 6 = 1 + 5`],
+                  [`√(1² + (√5)² + 2·1·√5)`, `viết 1 = 1², 5 = (√5)², và 2√5 = 2·1·√5`],
+                  [`√((1 + √5)²)`, `gộp ba số hạng lại theo ${FI('(a + b)²')} với a = 1, b = √5`],
+                  [RS(`1 + √5`), `theo ${FI('√(x²) = |x|')}: √((1+√5)²) = |1+√5|, mà 1 + √5 > 0 nên bỏ được dấu | |`]
+                ]),
+                speak: "Bây giờ ta viết ra từng bước biến đổi. Bắt đầu từ căn của hai nhân ba cộng căn năm. Nhân hai vào ngoặc: hai nhân ba bằng sáu, hai nhân căn năm bằng hai căn năm, ta được căn của sáu cộng hai căn năm. Tách sáu thành một cộng năm. Rồi viết một là một bình phương, năm là căn năm bình phương, và hai căn năm là hai nhân một nhân căn năm. Ba số hạng này gộp lại đúng theo công thức thành một cộng căn năm, cả bình phương. Cuối cùng, căn của một biểu thức bình phương bằng giá trị tuyệt đối của biểu thức đó, mà một cộng căn năm là số dương, nên ta được kết quả một cộng căn năm."
+              }
+            ],
+            conclusion: { text: `✓ √(2(3+√5)) = 1 + √5`, speak: "Kết luận bước một: căn của hai nhân ba cộng căn năm bằng một cộng căn năm. Mặt nạ đầu tiên đã rơi." }
+          },
+          {
+            label: "Bước 2 — Làm tương tự cho B (chú ý cái bẫy dấu)",
+            speakLabel: "Bước hai: bạn B, và ở đây có một cái bẫy.",
+            lines: [
+              {
+                text: TH(`Với B ta có 2(3 − √5) = 6 − 2√5. Có dấu trừ nên dùng công thức hiệu:`)
+                  + FM(`(a − b)² = a² − 2ab + b²`)
+                  + TH(`So khớp với 6 − 2√5: 2ab = 2√5 nên chọn a = √5, b = 1. Kiểm tra: a² + b² = (√5)² + 1² = 5 + 1 = 6 ✓`),
+                speak: "Với B, hai nhân ba trừ căn năm bằng sáu trừ hai căn năm. Có dấu trừ nên ta dùng công thức hiệu: a trừ b, bình phương, bằng a bình phương trừ hai a b cộng b bình phương. So khớp với sáu trừ hai căn năm: hai a b bằng hai căn năm, nên chọn a bằng căn năm, b bằng một. Kiểm tra: năm cộng một bằng sáu, đúng."
+              },
+              {
+                text: CH([
+                  [`√(2(3−√5))`, ''],
+                  [`√(6 − 2√5)`, `nhân 2 vào ngoặc`],
+                  [`√(5 + 1 − 2√5)`, `tách 6 = 5 + 1`],
+                  [`√((√5)² + 1² − 2·√5·1)`, `viết 5 = (√5)², 1 = 1², và 2√5 = 2·√5·1`],
+                  [`√((√5 − 1)²)`, `gộp lại theo ${FI('(a − b)²')} với a = √5, b = 1`],
+                  [`|√5 − 1|`, `theo ${FI('√(x²) = |x|')}`],
+                  [RS(`√5 − 1`), `vì √5 ≈ 2,236 > 1 nên √5 − 1 > 0, bỏ được dấu | |`]
+                ]),
+                speak: "Ta viết ra từng bước. Bắt đầu từ căn của hai nhân ba trừ căn năm. Nhân hai vào ngoặc, được căn của sáu trừ hai căn năm. Tách sáu thành năm cộng một. Viết năm là căn năm bình phương, một là một bình phương, và hai căn năm là hai nhân căn năm nhân một. Gộp lại theo công thức hiệu, được căn của, căn năm trừ một, bình phương. Căn của một bình phương bằng giá trị tuyệt đối, nên ta có giá trị tuyệt đối của căn năm trừ một. Vì căn năm khoảng hai phẩy hai ba sáu, lớn hơn một, nên căn năm trừ một dương, bỏ được dấu giá trị tuyệt đối. Kết quả là căn năm trừ một."
+              },
+              {
+                text: WARN(`⚠ Cái bẫy: √(x²) = |x|, KHÔNG phải x. Nếu quên dấu | | và bỏ căn luôn, có bạn sẽ viết ra 1 − √5 ≈ −1,236 — một căn bậc hai mà ra số âm thì chắc chắn sai! Luôn kiểm tra: kết quả của căn bậc hai phải ≥ 0.`),
+                speak: "Cô cảnh báo cái bẫy này. Căn của x bình phương bằng giá trị tuyệt đối của x, chứ không phải x. Nếu quên dấu giá trị tuyệt đối và bỏ căn luôn, có bạn sẽ viết ra một trừ căn năm, khoảng âm một phẩy hai ba sáu. Một căn bậc hai mà ra số âm thì chắc chắn sai. Luôn nhớ kiểm tra: kết quả của căn bậc hai phải lớn hơn hoặc bằng không."
+              }
+            ],
+            conclusion: { text: `✓ √(2(3−√5)) = √5 − 1`, speak: "Kết luận bước hai: căn của hai nhân ba trừ căn năm bằng căn năm trừ một." }
+          },
+          {
+            label: "Bước 3 — Thay vào A, B rồi khử căn ở dưới",
+            speakLabel: "Bước ba: thay kết quả vừa tìm vào A và B.",
+            lines: [
+              {
+                text: CH([
+                  [`A = ${F('3+√5', '4 + ' + HL('√(2(3+√5))'))}`, ''],
+                  [`${F('3+√5', '4 + ' + RS('1+√5'))}`, `thay kết quả bước 1: √(2(3+√5)) = 1 + √5`],
+                  [`${F('3+√5', '5+√5')}`, `4 + 1 = 5, còn √5 giữ nguyên`]
+                ]),
+                speak: "Thay vào A. Ban đầu A bằng ba cộng căn năm, trên, bốn cộng căn của hai nhân ba cộng căn năm. Phần tô vàng là cái căn ta vừa gỡ ở bước một, nó bằng một cộng căn năm. Thay vào, A bằng ba cộng căn năm, trên, bốn cộng một cộng căn năm. Bốn cộng một bằng năm, nên A bằng ba cộng căn năm, trên, năm cộng căn năm."
+              },
+              {
+                text: TH(`Phía dưới vẫn còn 5 + √5, tức là còn căn ở dưới. Muốn khử căn ta dùng công thức:`)
+                  + FM(`(a + b)(a − b) = a² − b²`)
+                  + TH(`Nhân 5 + √5 với 5 − √5 sẽ được 5² − (√5)² = 25 − 5 = 20 — hết căn! Nhưng đã nhân phía dưới thì phải nhân cả phía trên, để giá trị phân số không đổi (giống như nhân với 1 = (5 − √5)/(5 − √5)).`),
+                speak: "Phía dưới vẫn còn năm cộng căn năm, tức là còn căn ở dưới. Muốn khử căn ta dùng công thức: a cộng b nhân a trừ b bằng a bình phương trừ b bình phương. Nhân năm cộng căn năm với năm trừ căn năm sẽ được năm bình phương trừ căn năm bình phương, bằng hai mươi lăm trừ năm, bằng hai mươi. Hết căn rồi! Nhưng đã nhân phía dưới thì phải nhân cả phía trên, để giá trị của phân số không đổi, giống như ta nhân với một, viết dưới dạng năm trừ căn năm chia cho năm trừ căn năm."
+              },
+              {
+                text: CH([
+                  [`A = ${F('3+√5', '5+√5')}`, ''],
+                  [`${F('(3+√5)(5−√5)', '(5+√5)(5−√5)')}`, `nhân cả trên lẫn dưới với (5 − √5)`],
+                  [`${F('3·5 − 3·√5 + √5·5 − √5·√5', '5² − (√5)²')}`, `trên: nhân từng số hạng của ngoặc thứ nhất với từng số hạng của ngoặc thứ hai; dưới: dùng ${FI('(a+b)(a−b) = a²−b²')}`],
+                  [`${F('15 − 3√5 + 5√5 − 5', '25 − 5')}`, `3·5 = 15; √5·√5 = 5; 5² = 25`],
+                  [`${F('10 + 2√5', '20')}`, `trên: 15 − 5 = 10 và −3√5 + 5√5 = 2√5; dưới: 25 − 5 = 20`],
+                  [`${F('2(5 + √5)', '2·10')}`, `trên: đặt 2 làm nhân tử chung; dưới: viết 20 = 2·10`],
+                  [RS(`${F('5+√5', '10')}`), `rút gọn cho 2`]
+                ]),
+                speak: "Bây giờ viết ra từng bước. A bằng ba cộng căn năm, trên, năm cộng căn năm. Nhân cả trên lẫn dưới với năm trừ căn năm. Ở phía trên, ta nhân từng số hạng của ngoặc thứ nhất với từng số hạng của ngoặc thứ hai: ba nhân năm, ba nhân trừ căn năm, căn năm nhân năm, căn năm nhân trừ căn năm. Ở phía dưới, dùng công thức, được năm bình phương trừ căn năm bình phương. Tính ra: ba nhân năm bằng mười lăm, căn năm nhân căn năm bằng năm, năm bình phương bằng hai mươi lăm. Trên: mười lăm trừ năm bằng mười, và trừ ba căn năm cộng năm căn năm bằng hai căn năm. Dưới: hai mươi lăm trừ năm bằng hai mươi. Được mười cộng hai căn năm, trên hai mươi. Đặt hai làm nhân tử chung ở trên, viết hai mươi bằng hai nhân mười ở dưới, rồi rút gọn cho hai. Kết quả A bằng năm cộng căn năm, trên mười."
+              },
+              {
+                text: CH([
+                  [`B = ${F('3−√5', '4 − ' + HL('√(2(3−√5))'))}`, ''],
+                  [`${F('3−√5', '4 − ' + RS('(√5−1)'))}`, `thay kết quả bước 2, GIỮ ngoặc vì đang trừ cả cụm √5 − 1`],
+                  [`${F('3−√5', '4 − √5 + 1')}`, `bỏ ngoặc có dấu trừ đứng trước thì đổi dấu từng số hạng bên trong: −(√5 − 1) = −√5 + 1`],
+                  [`${F('3−√5', '5 − √5')}`, `4 + 1 = 5`]
+                ]),
+                speak: "Làm tương tự với B. B bằng ba trừ căn năm, trên, bốn trừ căn của hai nhân ba trừ căn năm. Phần tô vàng là cái căn ta vừa gỡ ở bước hai, nó bằng căn năm trừ một. Thay vào, nhớ giữ ngoặc vì đang trừ cả cụm: bốn trừ, mở ngoặc, căn năm trừ một, đóng ngoặc. Bỏ ngoặc có dấu trừ đứng trước thì đổi dấu từng số hạng bên trong: trừ căn năm cộng một. Bốn cộng một bằng năm. Vậy B bằng ba trừ căn năm, trên, năm trừ căn năm."
+              },
+              {
+                text: CH([
+                  [`B = ${F('3−√5', '5−√5')}`, ''],
+                  [`${F('(3−√5)(5+√5)', '(5−√5)(5+√5)')}`, `nhân cả trên lẫn dưới với (5 + √5)`],
+                  [`${F('3·5 + 3·√5 − √5·5 − √5·√5', '5² − (√5)²')}`, `trên: nhân từng số hạng với từng số hạng; dưới: dùng ${FI('(a−b)(a+b) = a²−b²')}`],
+                  [`${F('15 + 3√5 − 5√5 − 5', '25 − 5')}`, `3·5 = 15; √5·√5 = 5; 5² = 25`],
+                  [`${F('10 − 2√5', '20')}`, `trên: 15 − 5 = 10 và 3√5 − 5√5 = −2√5; dưới: 25 − 5 = 20`],
+                  [`${F('2(5 − √5)', '2·10')}`, `trên: đặt 2 làm nhân tử chung; dưới: viết 20 = 2·10`],
+                  [RS(`${F('5−√5', '10')}`), `rút gọn cho 2`]
+                ]),
+                speak: "Tiếp tục với B. B bằng ba trừ căn năm, trên, năm trừ căn năm. Nhân cả trên lẫn dưới với năm cộng căn năm. Phía trên nhân từng số hạng với từng số hạng: ba nhân năm, ba nhân căn năm, trừ căn năm nhân năm, trừ căn năm nhân căn năm. Phía dưới dùng công thức, được năm bình phương trừ căn năm bình phương. Tính ra: mười lăm cộng ba căn năm trừ năm căn năm trừ năm, trên hai mươi lăm trừ năm. Trên: mười lăm trừ năm bằng mười, ba căn năm trừ năm căn năm bằng trừ hai căn năm. Dưới bằng hai mươi. Đặt hai làm nhân tử chung rồi rút gọn cho hai, ta được B bằng năm trừ căn năm, trên mười."
+              }
+            ],
+            conclusion: { text: `✓ A = ${F('5+√5', '10')} ; B = ${F('5−√5', '10')}`, speak: "Kết luận bước ba: A bằng năm cộng căn năm trên mười, B bằng năm trừ căn năm trên mười. Hai anh em đã hết đeo mặt nạ." }
+          },
+          {
+            label: "Bước 4 — Chọn hướng đi thông minh: tính A − B và A·B",
+            speakLabel: "Bước bốn: đây là chỗ cần suy nghĩ nhất, đừng vội lập phương.",
+            lines: [
+              {
+                text: TH(`Có hai con đường. <b>Đường 1</b>: lập phương thẳng A và B — phải tính (5 + √5)³ rồi chia 1000, cồng kềnh và rất dễ sai. <b>Đường 2</b>: để ý A và B giống hệt nhau, chỉ khác dấu của √5 → A − B và A·B chắc chắn sẽ rất gọn. Ta đi đường 2, nhưng cần một công thức nối A³ − B³ với A − B và A·B.`),
+                speak: "Đến đây có hai con đường. Đường một: lập phương thẳng A và B, phải tính năm cộng căn năm mũ ba rồi chia một nghìn, cồng kềnh và rất dễ sai. Đường hai: để ý A và B giống hệt nhau, chỉ khác dấu của căn năm, nên A trừ B và tích A B chắc chắn sẽ rất gọn. Ta đi đường hai, nhưng cần một công thức nối A mũ ba trừ B mũ ba với A trừ B và tích A B."
+              },
+              {
+                text: FM(`(a − b)³ = a³ − 3a²b + 3ab² − b³`)
+                  + CH([
+                    [`(A − B)³`, ''],
+                    [`A³ − 3A²B + 3AB² − B³`, `khai triển theo công thức trên với a = A, b = B`],
+                    [`A³ − B³ − 3AB(A − B)`, `đổi chỗ B³ lên sau A³; và −3A²B + 3AB² = −3AB(A − B) (đặt −3AB làm nhân tử chung)`]
+                  ])
+                  + FM(`A³ − B³ = (A − B)³ + 3AB(A − B)`),
+                speak: "Ta bắt đầu từ công thức lập phương của một hiệu: a trừ b, mũ ba, bằng a mũ ba trừ ba a bình phương b cộng ba a b bình phương trừ b mũ ba. Áp dụng với a bằng A, b bằng B. A trừ B, mũ ba, bằng A mũ ba trừ ba A bình phương B cộng ba A B bình phương trừ B mũ ba. Đổi chỗ B mũ ba, và đặt trừ ba A B làm nhân tử chung cho hai số hạng ở giữa, ta được A mũ ba trừ B mũ ba trừ ba A B nhân A trừ B. Chuyển vế, ta có công thức cần dùng: A mũ ba trừ B mũ ba bằng A trừ B, mũ ba, cộng ba A B nhân A trừ B."
+              },
+              {
+                text: CH([
+                  [`A − B = ${F('5+√5', '10')} − ${F('5−√5', '10')}`, ''],
+                  [`${F('(5+√5) − (5−√5)', '10')}`, `hai phân số cùng dưới 10 nên trừ trực tiếp phần trên`],
+                  [`${F('5 + √5 − 5 + √5', '10')}`, `bỏ ngoặc có dấu trừ đứng trước: −(5 − √5) = −5 + √5`],
+                  [`${F('2√5', '10')}`, `5 − 5 = 0 và √5 + √5 = 2√5`],
+                  [RS(`${F('√5', '5')}`), `rút gọn cho 2`]
+                ]),
+                speak: "Tính A trừ B. A trừ B bằng năm cộng căn năm trên mười, trừ, năm trừ căn năm trên mười. Hai phân số cùng dưới mười nên trừ trực tiếp phần trên: năm cộng căn năm, trừ, ngoặc, năm trừ căn năm. Bỏ ngoặc có dấu trừ đứng trước thì đổi dấu: năm cộng căn năm trừ năm cộng căn năm. Năm trừ năm bằng không, căn năm cộng căn năm bằng hai căn năm. Được hai căn năm trên mười, rút gọn cho hai thành căn năm trên năm."
+              },
+              {
+                text: CH([
+                  [`A·B = ${F('5+√5', '10')} · ${F('5−√5', '10')}`, ''],
+                  [`${F('(5+√5)(5−√5)', '10·10')}`, `nhân trên với trên, dưới với dưới`],
+                  [`${F('5² − (√5)²', '100')}`, `dùng ${FI('(a+b)(a−b) = a²−b²')} với a = 5, b = √5`],
+                  [`${F('25 − 5', '100')}`, `5² = 25 và (√5)² = 5`],
+                  [`${F('20', '100')}`, `25 − 5 = 20`],
+                  [RS(`${F('1', '5')}`), `rút gọn cho 20`]
+                ]),
+                speak: "Tính tích A B. A nhân B bằng năm cộng căn năm trên mười, nhân, năm trừ căn năm trên mười. Nhân trên với trên, dưới với dưới: năm cộng căn năm nhân năm trừ căn năm, trên mười nhân mười. Dùng công thức a cộng b nhân a trừ b, với a bằng năm, b bằng căn năm, được năm bình phương trừ căn năm bình phương, trên một trăm. Năm bình phương bằng hai mươi lăm, căn năm bình phương bằng năm. Hai mươi lăm trừ năm bằng hai mươi. Hai mươi trên một trăm rút gọn cho hai mươi được một phần năm."
+              }
+            ],
+            conclusion: { text: `✓ A − B = ${F('√5', '5')} ; A·B = ${F('1', '5')}`, speak: "Kết luận bước bốn: A trừ B bằng căn năm trên năm, và tích A B bằng một phần năm." }
+          },
+          {
+            label: "Bước 5 — Thay số vào công thức và kiểm tra bằng máy tính",
+            speakLabel: "Bước cuối: thay số vào công thức, rồi kiểm tra.",
+            lines: [
+              {
+                text: CH([
+                  [`A³ − B³ = (A − B)³ + 3AB(A − B)`, ''],
+                  [`(${F('√5', '5')})³ + 3 · ${F('1', '5')} · ${F('√5', '5')}`, `thay A − B = √5/5 và A·B = 1/5`],
+                  [`${F('(√5)³', '5³')} + ${F('3√5', '25')}`, `lập phương phân số: (a/b)³ = a³/b³; và 3 · (1/5) · (√5/5) = 3√5/(5·5)`],
+                  [`${F('5√5', '125')} + ${F('3√5', '25')}`, `(√5)³ = √5·√5·√5 = 5·√5; và 5³ = 125`],
+                  [`${F('√5', '25')} + ${F('3√5', '25')}`, `rút gọn 5√5/125 = √5/25 (chia cả trên lẫn dưới cho 5)`],
+                  [RS(`${F('4√5', '25')}`), `hai phân số cùng dưới 25: cộng phần trên (1 + 3)√5 = 4√5`]
+                ]),
+                speak: "Bắt đầu từ công thức: A mũ ba trừ B mũ ba bằng A trừ B, mũ ba, cộng ba A B nhân A trừ B. Thay A trừ B bằng căn năm trên năm, và A B bằng một phần năm: căn năm trên năm, mũ ba, cộng ba nhân một phần năm nhân căn năm trên năm. Lập phương phân số: căn năm mũ ba trên năm mũ ba. Còn ba nhân một phần năm nhân căn năm trên năm bằng ba căn năm trên hai mươi lăm. Tính căn năm mũ ba bằng căn năm nhân căn năm nhân căn năm, bằng năm căn năm; năm mũ ba bằng một trăm hai mươi lăm. Rút gọn năm căn năm trên một trăm hai mươi lăm cho năm, được căn năm trên hai mươi lăm. Cuối cùng hai phân số cùng dưới hai mươi lăm nên cộng phần trên: một cộng ba bằng bốn, được bốn căn năm trên hai mươi lăm."
+              },
+              {
+                text: `<div class="think">🧮 Kiểm tra bằng số: √5 ≈ 2,2361 → A ≈ 0,7236; B ≈ 0,2764; A³ ≈ 0,3789; B³ ≈ 0,0211 → A³ − B³ ≈ 0,3578.<br>Còn 4√5/25 ≈ 8,9443/25 ≈ 0,3578 ✓ khớp!</div>`,
+                speak: "Kiểm tra bằng số: căn năm xấp xỉ hai phẩy hai ba sáu một, suy ra A xấp xỉ không phẩy bảy hai ba sáu, B xấp xỉ không phẩy hai bảy sáu bốn. Lập phương lên rồi trừ được khoảng không phẩy ba năm bảy tám. Còn bốn căn năm trên hai mươi lăm cũng ra khoảng không phẩy ba năm bảy tám. Khớp nhau, vậy là ta làm đúng."
+              }
+            ],
+            conclusion: { text: `✓ A³ − B³ = ${F('4√5', '25')}`, speak: "Kết luận: A mũ ba trừ B mũ ba bằng bốn căn năm trên hai mươi lăm." }
+          }
+        ],
+        finalAnswer: `A<sup>3</sup> − B<sup>3</sup> = ${F('4√5', '25')}`,
+        speakFinal: "Tổng kết. A bằng năm cộng căn năm trên mười, B bằng năm trừ căn năm trên mười. A mũ ba trừ B mũ ba bằng bốn căn năm trên hai mươi lăm, xấp xỉ không phẩy ba năm bảy tám.",
+        lesson: "💡 Bốn bài học: (1) Gặp căn trong căn dạng √(m + 2√n), hãy thử viết m + 2√n = (a + b)² với a² + b² = m và ab = n. (2) Khi có hai biểu thức liên hợp A và B, hãy nghĩ ngay đến A − B và A·B — hai đại lượng này thường rất 'đẹp'. (3) √(x²) = |x|: luôn xét dấu trước khi bỏ căn. (4) Khi biến đổi, viết thành chuỗi A = … = … = … và ghi lý do mỗi bước, để người đọc luôn thấy biểu thức đang biến thành gì. Và nhớ: bài nhìn dữ dằn thường chỉ đang đeo mặt nạ!",
+        speakLesson: "Bài học rút ra, có bốn điều. Một: gặp căn trong căn dạng căn của m cộng hai căn n, hãy thử viết thành bình phương của một tổng. Hai: khi có hai biểu thức liên hợp A và B, hãy nghĩ ngay đến hiệu A trừ B và tích A B, vì hai đại lượng này thường rất đẹp. Ba: căn của x bình phương bằng giá trị tuyệt đối của x, nên luôn xét dấu trước khi bỏ căn. Bốn: khi biến đổi, hãy viết thành chuỗi bằng nhau nối tiếp và ghi lý do mỗi bước, để người đọc luôn thấy biểu thức đang biến thành gì. Và nhớ nhé, gặp bài nhìn dữ dằn thì đừng vội sợ, thường nó chỉ đang đeo mặt nạ thôi."
+      }
+    ];
+
+    // Vẽ dấu căn có gạch ngang phủ HẾT biểu thức dưới căn (để học sinh không hiểu nhầm phạm vi của căn)
+    function fmtRad(str) {
+      let out = "", i = 0;
+      while (i < str.length) {
+        const ch = str[i];
+        if (ch !== "√") { out += ch; i++; continue; }
+        let j = i + 1, inner = "";
+        if (str[j] === "(") {
+          let depth = 0, k = j;
+          for (; k < str.length; k++) {
+            if (str[k] === "(") depth++;
+            else if (str[k] === ")") { depth--; if (depth === 0) break; }
+          }
+          inner = str.slice(j + 1, k);
+          j = k + 1;
+        } else {
+          let k = j;
+          while (k < str.length && /[0-9A-Za-z]/.test(str[k])) k++;
+          inner = str.slice(j, k);
+          j = k;
+        }
+        out += `<span class="rad"><span class="rs">√</span><span class="rc">${fmtRad(inner)}</span></span>`;
+        i = j;
+      }
+      return out;
+    }
+    PROBLEMS.forEach(p => {
+      p.deBai = fmtRad(p.deBai);
+      p.finalAnswer = fmtRad(p.finalAnswer);
+      p.lesson = fmtRad(p.lesson);
+      p.parts.forEach(pt => {
+        pt.label = fmtRad(pt.label);
+        pt.lines.forEach(l => { l.text = fmtRad(l.text); });
+        pt.conclusion.text = fmtRad(pt.conclusion.text);
+      });
+    });
+
+    let currentProblem = 0, currentStep = -1, speaking = false, paused = false, flowRunning = false;
+    let phraseQueue = [], phraseIndex = 0, phraseResolve = null, usingPaidAudio = false;
+    const doneProblems = new Set();
+
+    const chat = document.getElementById("chat");
+    const voiceStatus = document.getElementById("voiceStatus");
+    const btnStart = document.getElementById("btnStart");
+    const btnPause = document.getElementById("btnPause");
+    const deBai = document.getElementById("deBai");
+    const figureArea = document.getElementById("figureArea");
+    const audioArea = document.getElementById("audioArea");
+    const paidAudio = document.getElementById("paidAudio");
+
+    function getVietnameseVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      let vi = voices.find(v => (v.lang === "vi-VN" || v.lang.startsWith("vi")) && /female|nữ|linh|mai|hoaimy|my|woman|google/i.test(v.name));
+      if (!vi) vi = voices.find(v => v.lang === "vi-VN" || v.lang.startsWith("vi"));
+      if (!vi) vi = voices.find(v => /vietnam|linh|mai|vietnamese/i.test(v.name));
+      return vi || null;
+    }
+
+    function splitPhrases(text) {
+      if (!text || !text.trim()) return [];
+      const parts = text.split(/(?<=[.?!;])\s+/).map(s => s.trim()).filter(s => s.length > 0);
+      if (parts.length === 1 && parts[0].length > 80) {
+        return parts[0].split(/(?<=,)\s+/).map(s => s.trim()).filter(s => s.length > 0);
+      }
+      return parts.length ? parts : [text.trim()];
+    }
+
+    function speakNextPhrase() {
+      if (paused) return;
+      if (phraseIndex >= phraseQueue.length) {
+        speaking = false; phraseQueue = []; phraseIndex = 0;
+        voiceStatus.classList.remove("show");
+        btnPause.disabled = true; btnPause.textContent = "⏸ Dừng nói";
+        const resolve = phraseResolve; phraseResolve = null;
+        if (resolve) setTimeout(resolve, 300);
+        return;
+      }
+      const text = phraseQueue[phraseIndex];
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "vi-VN"; u.rate = 0.76; u.pitch = 1.08; u.volume = 1;
+      const vi = getVietnameseVoice(); if (vi) u.voice = vi;
+      speaking = true;
+      voiceStatus.classList.add("show");
+      voiceStatus.textContent = vi ? `🔊 ${vi.name}` : "🔊 Đang nói...";
+      btnPause.disabled = false; btnPause.textContent = "⏸ Dừng nói";
+      u.onend = () => { if (paused) return; phraseIndex++; setTimeout(speakNextPhrase, 180); };
+      u.onerror = () => { if (paused) return; phraseIndex++; setTimeout(speakNextPhrase, 100); };
+      setTimeout(() => { if (!paused) window.speechSynthesis.speak(u); }, 60);
+    }
+
+    function speak(text) {
+      return new Promise((resolve) => {
+        if (!window.speechSynthesis) { resolve(); return; }
+        usingPaidAudio = false; audioArea.classList.remove("active");
+        phraseQueue = splitPhrases(text); phraseIndex = 0; phraseResolve = resolve; paused = false;
+        if (window.speechSynthesis.getVoices().length === 0) {
+          window.speechSynthesis.onvoiceschanged = () => speakNextPhrase();
+          setTimeout(speakNextPhrase, 280);
+        } else speakNextPhrase();
+      });
+    }
+
+    function togglePause() {
+      if (!phraseResolve && !paused && !speaking) return;
+      if (!paused) {
+        paused = true;
+        if (usingPaidAudio) paidAudio.pause(); else window.speechSynthesis.cancel();
+        speaking = false; voiceStatus.classList.remove("show");
+        btnPause.textContent = "▶ Tiếp tục"; btnPause.disabled = false;
+      } else {
+        paused = false; btnPause.textContent = "⏸ Dừng nói";
+        if (usingPaidAudio) {
+          paidAudio.play(); speaking = true;
+          voiceStatus.classList.add("show"); voiceStatus.textContent = "🎧 Audio trả phí";
+        } else speakNextPhrase();
+      }
+    }
+
+    function stopSpeakCompletely() {
+      paused = false;
+      if (usingPaidAudio) { paidAudio.pause(); paidAudio.currentTime = 0; usingPaidAudio = false; }
+      window.speechSynthesis.cancel(); speaking = false;
+      phraseQueue = []; phraseIndex = 0;
+      if (phraseResolve) { const r = phraseResolve; phraseResolve = null; r(); }
+      voiceStatus.classList.remove("show"); audioArea.classList.remove("active");
+      btnPause.disabled = true; btnPause.textContent = "⏸ Dừng nói";
+    }
+
+    function addMsg(content, type = "ai") {
+      const div = document.createElement("div");
+      div.className = `msg ${type}`;
+      if (typeof content === "string" && (content.includes("<div") || content.includes("<span") || content.includes("<br") || content.includes("<sup") || content.includes("&lt;"))) {
+        div.innerHTML = content;
+      } else div.textContent = content;
+      chat.appendChild(div);
+      requestAnimationFrame(() => chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" }));
+      return div;
+    }
+
+    function setStep(n) {
+      document.querySelectorAll(".step").forEach(s => {
+        s.classList.remove("active", "done");
+        const sn = parseInt(s.dataset.step);
+        if (sn < n) s.classList.add("done");
+        if (sn === n) s.classList.add("active");
+      });
+    }
+
+    function selectProblem(idx) {
+      stopSpeakCompletely(); flowRunning = false; currentProblem = idx;
+      document.querySelectorAll(".problem-nav button").forEach((b, i) => b.classList.toggle("active", i === idx));
+      loadProblem(); resetLesson();
+    }
+
+    function loadProblem() {
+      const p = PROBLEMS[currentProblem];
+      deBai.innerHTML = p.deBai;
+      if (p.figure) { figureArea.innerHTML = p.figure; figureArea.classList.remove("hidden"); }
+      else { figureArea.innerHTML = ""; figureArea.classList.add("hidden"); }
+    }
+
+    async function startLesson() {
+      if (flowRunning) return;
+      flowRunning = true;
+      if (window.speechSynthesis) { const warm = new SpeechSynthesisUtterance(" "); warm.volume = 0; window.speechSynthesis.speak(warm); }
+      btnStart.disabled = true; chat.innerHTML = ""; currentStep = 0; setStep(0); paused = false;
+      const p = PROBLEMS[currentProblem];
+
+      addMsg("Đọc đề kỹ một lần.", "read");
+      await speak(p.speakRead);
+      if (!flowRunning) return;
+
+      currentStep = 1; setStep(1);
+      addMsg("Xác định các ý cần giải.", "ai");
+      await speak(p.speakObs);
+      if (!flowRunning) return;
+
+      currentStep = 2; setStep(2);
+      for (const part of p.parts) {
+        if (!flowRunning) return;
+        addMsg("── " + part.label + " ──", "part");
+        await speak(part.speakLabel);
+        if (!flowRunning) return;
+        for (const line of part.lines) {
+          if (!flowRunning) return;
+          addMsg(line.text, "key");
+          await speak(line.speak);
+          await new Promise(r => setTimeout(r, 280));
+        }
+        addMsg(part.conclusion.text, "conclusion");
+        await speak(part.conclusion.speak);
+        await new Promise(r => setTimeout(r, 400));
+      }
+      if (!flowRunning) return;
+
+      currentStep = 3; setStep(3);
+      addMsg(p.finalAnswer, "conclusion");
+      await speak(p.speakFinal);
+      if (!flowRunning) return;
+
+      currentStep = 4; setStep(4);
+      addMsg(p.lesson, "lesson");
+      await speak(p.speakLesson);
+
+      doneProblems.add(currentProblem);
+      document.querySelectorAll(".problem-nav button")[currentProblem].classList.add("done");
+      flowRunning = false; btnPause.disabled = true; btnStart.disabled = false;
+    }
+
+    function resetLesson() {
+      stopSpeakCompletely(); flowRunning = false; chat.innerHTML = "";
+      currentStep = -1; setStep(-1); btnStart.disabled = false;
+    }
+
+    loadProblem();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+  </script>
+</body>
+</html>
